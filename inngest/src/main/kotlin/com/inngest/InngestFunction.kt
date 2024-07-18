@@ -34,8 +34,8 @@ annotation class FunctionIfTrigger(
 )
 
 
-abstract class InngestFunction {
-
+// TODO - if the id and function triggers are provided in ctor then expect builder to not have same properties
+abstract class InngestFunction(val id: String?, val eventTrigger: String?) {
 //    abstract val id: String;
 
     // TODO: Throw illegal argument exception
@@ -56,6 +56,23 @@ abstract class InngestFunction {
             return this
         }
 
+        /**
+         * @param event - The name of the event to trigger on
+         * @param `if` - An expression to evaluate before triggering (optional)
+         * @param cron - A cron expression to trigger on (optional)
+         */
+        fun trigger2(event: String? = null,
+                     `if`: String? = null,
+                     cron: String? = null): Builder {
+            this.triggers.add(InngestFunctionTrigger(event, `if`, cron))
+            return this;
+        }
+
+        /**
+         * For cases where you need to batch tasks
+         * @param maxSize - The maximum number of events to batch
+         * @param timeout - The maximum duration of the function
+         */
         fun batchEvents(maxSize: Int, timeout: Duration, key: String? = null): Builder {
             this.batchEvents = BatchEvents(maxSize, timeout, key)
             return this;
@@ -99,6 +116,11 @@ abstract class InngestFunction {
         return builder
     }
 
+    /**
+     * The function body. This is the main logic of your function
+     * @param ctx - The function context, for accessing the event payload
+     * @param step - The step object, for invoking other functions
+     */
     abstract fun execute(
         ctx: FunctionContext,
         step: Step,

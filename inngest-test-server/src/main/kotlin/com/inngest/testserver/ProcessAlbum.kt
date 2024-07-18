@@ -1,17 +1,20 @@
 package com.inngest.testserver
 
-import com.inngest.*
+import com.inngest.FunctionContext
+import com.inngest.InngestFunction
+import com.inngest.InngestFunctionTrigger
+import com.inngest.Step
 import java.time.Duration
 
-@FunctionConfig(id = "ProcessAlbum", name = "ProcessAlbum")
-@FunctionEventTrigger(event = "delivery/process.requested")
-class ProcessAlbum : InngestFunction() {
-
+class ProcessAlbum : InngestFunction(
+    "ProcessAlbum",
+    "delivery/process.requested"
+) {
     //    override val id = "ProcessAlbum"
     override fun config(builder: InngestFunction.Builder): InngestFunction.Builder {
         return builder
             .name("Process Album!")
-            .trigger(InngestFunctionTrigger(event = "delivery/process.requested"))
+            .trigger2("delivery/process.requested")
             .batchEvents(30, Duration.ofSeconds(10))
     }
 
@@ -19,7 +22,6 @@ class ProcessAlbum : InngestFunction() {
         ctx: FunctionContext,
         step: Step,
     ): LinkedHashMap<String, Any> {
-
 //        val list = ctx.events.map { e -> e.data.get("something") }
 //        println(list);
 
